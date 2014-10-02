@@ -37,6 +37,7 @@ module Airstream
         @wait.signal
       end
       @wait.wait
+      sleep(0.5)
       "http://#{@@server.options[:Host]}:#{@@server.options[:Port]}"
     end
     private :host_file
