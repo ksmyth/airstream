@@ -1,6 +1,7 @@
 
 require 'rack'
 require 'webrick'
+require 'monitor'
 
 module Airstream
   class Video
@@ -29,9 +30,13 @@ module Airstream
         :AccessLog => [], # stfu webrick
         :Logger => WEBrick::Log::new("/dev/null", 7)
       )
+      @mon   = Monitor.new
+      @wait = @mon.new_cond
       Thread.start do
         @@server.start
+        @wait.signal
       end
+      @wait.wait
       "http://#{@@server.options[:Host]}:#{@@server.options[:Port]}"
     end
     private :host_file
