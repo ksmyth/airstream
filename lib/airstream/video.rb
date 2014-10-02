@@ -31,7 +31,7 @@ module Airstream
         :Logger => WEBrick::Log::new("/dev/null", 7)
       )
       mon  = Monitor.new
-      wait = @mon.new_cond
+      wait = mon.new_cond
       Thread.start do
         @@server.start
         mon.synchronize do
