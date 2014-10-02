@@ -28,16 +28,18 @@ module Airstream
         :Port => AIRSTREAM_PORT,
         :app => Rack::File.new(@filename),
         :AccessLog => [], # stfu webrick
-        :Logger => WEBrick::Log::new("/dev/null", 7)
+        :Logger => WEBrick::Log::new("/dev/null", 7),
+        :StartCallback => Proc.new {
+          mon.synchronize do
+            wait.signal
+          end
+        }
       )
       mon  = Monitor.new
       wait = mon.new_cond
       mon.synchronize do
         Thread.start do
           @@server.start
-          mon.synchronize do
-            wait.signal
-          end
         end
         wait.wait
       end
