@@ -22,6 +22,7 @@ module Airstream
 
     def host_file
       @@server.server.shutdown if @@server
+      q = Queue.new
       @@server = Rack::Server.new(
         :server => :webrick,
         :Host => Airstream::Network.get_local_ip,
@@ -33,7 +34,6 @@ module Airstream
           q << 1
         }
       )
-      q = Queue.new
       Thread.start do
         @@server.start
       end
