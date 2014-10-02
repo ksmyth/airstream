@@ -30,13 +30,17 @@ module Airstream
         :AccessLog => [], # stfu webrick
         :Logger => WEBrick::Log::new("/dev/null", 7)
       )
-      @mon   = Monitor.new
-      @wait = @mon.new_cond
+      mon  = Monitor.new
+      wait = @mon.new_cond
       Thread.start do
         @@server.start
-        @wait.signal
+        mon.synchronize do
+          wait.signal
+        end
       end
-      @wait.wait
+      mon.synchronize do
+        wait.wait
+      end
       sleep(0.5)
       "http://#{@@server.options[:Host]}:#{@@server.options[:Port]}"
     end
