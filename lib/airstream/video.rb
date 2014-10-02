@@ -32,16 +32,15 @@ module Airstream
       )
       mon  = Monitor.new
       wait = mon.new_cond
-      Thread.start do
-        @@server.start
-        mon.synchronize do
-          wait.signal
-        end
-      end
       mon.synchronize do
+        Thread.start do
+          @@server.start
+          mon.synchronize do
+            wait.signal
+          end
+        end
         wait.wait
       end
-      sleep(0.5)
       "http://#{@@server.options[:Host]}:#{@@server.options[:Port]}"
     end
     private :host_file
