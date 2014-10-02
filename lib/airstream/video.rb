@@ -1,7 +1,7 @@
 
 require 'rack'
 require 'webrick'
-require 'monitor'
+require 'thread'
 
 module Airstream
   class Video
@@ -30,19 +30,14 @@ module Airstream
         :AccessLog => [], # stfu webrick
         :Logger => WEBrick::Log::new("/dev/null", 7),
         :StartCallback => Proc.new {
-          mon.synchronize do
-            wait.signal
-          end
+          q << 1
         }
       )
-      mon  = Monitor.new
-      wait = mon.new_cond
-      mon.synchronize do
-        Thread.start do
-          @@server.start
-        end
-        wait.wait
+      q = Queue.new
+      Thread.start do
+        @@server.start
       end
+      q.pop
       "http://#{@@server.options[:Host]}:#{@@server.options[:Port]}"
     end
     private :host_file
