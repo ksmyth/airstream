@@ -32,6 +32,7 @@ module Airstream
         :Logger => WEBrick::Log::new("/dev/null", 7),
         :StartCallback => Proc.new {
           q << 1
+          sleep(1)
         }
       )
       Thread.start do
